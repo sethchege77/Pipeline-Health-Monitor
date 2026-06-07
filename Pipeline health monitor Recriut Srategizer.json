@@ -1,0 +1,727 @@
+{
+  "name": "Pipeline health monitor Recriut Srategizer",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $now }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        3680,
+        1648
+      ],
+      "id": "17eaba7f-e85c-466e-a209-3f9e868d97de",
+      "name": "Simple Memory8"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"TimeStamp\":\"\",\n  \"Error\":\"\",\n  \"Solution\":\"\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3808,
+        1648
+      ],
+      "id": "a273567a-5f33-4e55-a399-f2d983b6f769",
+      "name": "Structured Output Parser8"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o",
+        "options": {
+          "maxTokens": 100,
+          "temperature": 0.7,
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        1648
+      ],
+      "id": "910a2153-6bb7-4f87-9946-69dcc52a7c6c",
+      "name": "OpenRouter Chat Model9",
+      "credentials": {
+        "openRouterApi": {
+          "id": "eJz4wvbykeYJmUUV",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "devstral-latest",
+        "options": {
+          "maxTokens": 100,
+          "temperature": 0.9,
+          "maxRetries": 2,
+          "safeMode": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        3424,
+        1648
+      ],
+      "id": "f7b14f6f-b816-4f22-a9c1-671e51db5440",
+      "name": "Mistral Cloud Chat Model11",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "ZOxKahg5XLCLngIi",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "007b2def-e3f2-49ba-9d25-7c91740ee11c",
+              "name": "Timestamp",
+              "value": "={{ $json.output.TimeStamp }}",
+              "type": "object"
+            },
+            {
+              "id": "e5ca8381-fe66-4379-b3fd-778a3590f606",
+              "name": "Error",
+              "value": "={{ $json.output.Error }}",
+              "type": "string"
+            },
+            {
+              "id": "8bb520fd-ecd9-4c38-ade7-9727fa5dc9d1",
+              "name": "Solution",
+              "value": "={{ $json.output.Solution }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4176,
+        1632
+      ],
+      "id": "295b2dd0-0e4a-49c5-b487-b0abd53b108c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1W29Bxz-zqCSCJ2Sd1UZpc642ced6xlhhkFAR80jv318/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1704883156,
+          "mode": "list",
+          "cachedResultName": "Recriut Strategizer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1W29Bxz-zqCSCJ2Sd1UZpc642ced6xlhhkFAR80jv318/edit#gid=1704883156"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "TimeStamp"
+          ],
+          "schema": [
+            {
+              "id": "TimeStamp",
+              "displayName": "TimeStamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Error",
+              "displayName": "Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Solution",
+              "displayName": "Solution",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4400,
+        1632
+      ],
+      "id": "37752c6e-37ed-4a19-b1e0-1ede7e19d689",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCmLBq0v2dczhuZ6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "seth.chege77@gmail.com",
+        "subject": "Error",
+        "emailType": "text",
+        "message": "ALERT!ALERT!!! Error detected in the Recriut Strategizer",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        4624,
+        1632
+      ],
+      "id": "ca628700-131a-4c55-95c7-4d82fe473daf",
+      "name": "Send a message2",
+      "webhookId": "354f2bf3-92a4-4b43-9a13-7164e0f0ec00",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7C4ZLHORbZZiQh23",
+          "name": "Seth gmail .77"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "devstral-medium-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        1312
+      ],
+      "id": "429fde23-92f2-4da8-96d9-672eb7e25538",
+      "name": "Mistral Cloud Chat Model1",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "ZOxKahg5XLCLngIi",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        1104
+      ],
+      "id": "cd04d310-61f5-433f-a76e-5b34cd148d2e",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "eJz4wvbykeYJmUUV",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $now }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2384,
+        1136
+      ],
+      "id": "dfab9dcf-9284-4560-9c85-fad3e3d5c186",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"bottleneck_stage\": \"The stage causing the biggest delay in the hiring pipeline\",\n  \"recommendations\": [\n    \"A single actionable recommendation to improve hiring speed (3 items total)\"\n  ],\n  \"html_report\": \"The complete HTML-formatted response with <ul> lists and <b> bolding\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2528,
+        1104
+      ],
+      "id": "698e1328-4d1a-4710-955a-05f1526be309",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "devstral-medium-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        1104
+      ],
+      "id": "0009ce73-0c5c-4b11-bf2d-cc3a988f3528",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "ZOxKahg5XLCLngIi",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "seth.chege77@gmail.com",
+        "subject": "HTML strategy report ",
+        "emailType": "text",
+        "message": "={{ $json.Title }}\n\n{{ $json.Text }}\n\n{{ $json['Bottleneck Stage'] }}\n\n{{ $json.Recomendations }}\n\n{{ $json['HTML strategy Report'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3168,
+        1040
+      ],
+      "id": "12a509ab-5770-4dd9-ab12-a457bf4b8242",
+      "name": "Send a message",
+      "webhookId": "d4d85e1b-e814-46e6-a266-5b215b035297",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7C4ZLHORbZZiQh23",
+          "name": "Seth gmail .77"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "data",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "cae04858-961b-44a5-9622-651c13100786",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        2032,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "model": "devstral-medium-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        3744,
+        1856
+      ],
+      "id": "1851aed4-4a09-438e-a5ca-7ca282af0c6d",
+      "name": "Mistral Cloud Chat Model2",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "ZOxKahg5XLCLngIi",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "The aggregated data is tthen processed by an ai agent whose purpose was to Analyze the aggregated metrics to find patterns and write the email.\n\n",
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2464,
+        624
+      ],
+      "typeVersion": 1,
+      "id": "1b0b4d51-7240-4340-861a-47807a371c04",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "DATA REVIEW AND ASSESSMENT",
+        "height": 672,
+        "width": 1616,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1712,
+        848
+      ],
+      "typeVersion": 1,
+      "id": "0a5d1048-3c03-4a02-ae95-386aeb74551e",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "The email is written and sent to the appropriate recipients \n",
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3296,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "fd75699b-2e5b-4164-b40d-9f8e0d191453",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "ERROR HANDLING",
+        "height": 752,
+        "width": 1424,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3376,
+        1328
+      ],
+      "typeVersion": 1,
+      "id": "1ef53817-a7ba-4b3f-aabb-96cc818aae68",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c8202bf-e0fd-466a-826b-6ddb1c6ab0ed",
+              "name": "Text",
+              "value": "This is the HTML strategy report",
+              "type": "string"
+            },
+            {
+              "id": "80c583eb-fd81-43b3-a3b0-8b283900b21e",
+              "name": "Recomendations",
+              "value": "={{ $json.output.recommendations }}",
+              "type": "array"
+            },
+            {
+              "id": "54c96415-03ec-489d-9707-c7c3f6869939",
+              "name": "Bottleneck Stage",
+              "value": "={{ $json.output.bottleneck_stage }}",
+              "type": "string"
+            },
+            {
+              "id": "32c49d1e-22b9-4b35-9586-5c8c71f7d490",
+              "name": "HTML strategy Report",
+              "value": "={{ $json.output.html_report }}",
+              "type": "string"
+            },
+            {
+              "id": "ef6d4fbe-8b81-4da8-9570-fdf7437081a5",
+              "name": "Title",
+              "value": "HTML Strategy Report",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2832,
+        880
+      ],
+      "id": "6d12822b-b28d-40af-ace5-302cd8f2a78a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the pipeline metrics gotten from the previous nodes : {{ $json.data }}\n\nIdentify the bottleneck stage (Interview, Offer, Screening).\nGive 4 useful recommendations to improve hiring speed.\n\nFormat the output as valid HTML (use <ul> for lists and <b> for bolding).\n",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2240,
+        880
+      ],
+      "id": "a1df347e-c2e0-45ac-b2bd-9d5e3a96a36e",
+      "name": "Recriut Strategizer",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Kindly review the error and give a suitable solution.\nEnsure to include the timestamp of the error in the output.",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are Marcus Chen, Senior Talent Operations Analyst at Talent Ops. You have 12 years of experience in recruitment analytics and pipeline optimization. You are meticulous, data-driven, and never sugar-coat your assessments.\n\nYour job is to evaluate individual candidates in the recruitment pipeline and flag those who are at risk of stalling or dropping out.\n\n## How You Analyze\n\n1. Review the candidate's current stage and how long they've been there\n2. Read interviewer feedback sentiment (even if brief or informal)\n3. Compare against historical benchmarks from the dataset\n\n## Decision Rules (Non-Negotiable)\n\n- \"Stalled\" = days_active > 7 in ANY single stage\n- \"Healthy\" = days_active ≤ 7\n- If feedback is overwhelmingly negative while days_active is high, escalate risk_factor severity\n- If data is missing or corrupted, default to \"Healthy\" with risk_factor \"Insufficient data for assessment\"\n\n## Output Rules\n\n- Respond with ONLY valid JSON\n- No markdown, no explanations, no small talk\n- candidate_health MUST be exactly \"Healthy\" or \"Stalled\" — no variations, no synonyms\n- risk_factor must be concise (5-15 words) and specific to this candidate\n\n## Tone of risk_factor\n\nDirect. Professional. No fluff.\nBad: \"The candidate seems to be taking a bit longer than we might expect\"\nGood: \"Interview stage exceeded 7-day SLA\"\nGood: \"Negative feedback + 10 days inactive\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3520,
+        1424
+      ],
+      "id": "af5f26d0-1661-4d92-9e34-942ed18f00bb",
+      "name": "Error handler for Recriut Strategizer",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "The data from the main workflow is received and the recruit strategizer analyses the data to give the bottleneck stages and make recommendations to improve hiring speed.",
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "f1ae8d6d-9249-4a1f-b4f5-0e9fa752d854",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Recriut Strategizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Recriut Strategizer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Recriut Strategizer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Recriut Strategizer",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory8": {
+      "ai_memory": [
+        [
+          {
+            "node": "Error handler for Recriut Strategizer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser8": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Error handler for Recriut Strategizer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Error handler for Recriut Strategizer",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model11": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Error handler for Recriut Strategizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Recriut Strategizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser8",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recriut Strategizer": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error handler for Recriut Strategizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error handler for Recriut Strategizer": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "FEDFLo8zElk6vC7d",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dac136c6-d9e7-4f43-acfe-ef72de132b13",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1c92e6d2758826f3d5c62cd3662bba6a9028a954802e057a2d3f0fd91308ae30"
+  },
+  "id": "6jfA5kWRjlYBcISF",
+  "tags": []
+}

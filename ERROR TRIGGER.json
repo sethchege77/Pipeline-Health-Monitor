@@ -1,0 +1,399 @@
+{
+  "name": "ERROR TRIGGER",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f6a40d9f-85b3-4568-8c6e-a1d163c4bd0a",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Kindly assess the error and give a suitable solution. Ensure to include the node the error occurs in and the timestamp .",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "72b36fd3-1db6-412a-be3e-49da8efec245",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "devstral-medium-latest",
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.7,
+          "maxRetries": 2,
+          "safeMode": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "cd3b58d3-b688-4b22-9a88-13b8d1db9838",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "ZOxKahg5XLCLngIi",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {
+          "maxTokens": 100,
+          "temperature": 0.7,
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        160,
+        304
+      ],
+      "id": "8341b242-d014-492f-9a42-80687df07dbf",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "eJz4wvbykeYJmUUV",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $now }}",
+        "contextWindowLength": 500
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        224
+      ],
+      "id": "64609bdc-b307-4ab6-b039-fcf3f156d596",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"timestamp\":\"\",\n  \"node of occurrence\":\"\",\n  \"error\":\"\",\n  \"solution\":\"\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        256
+      ],
+      "id": "71fc1ba7-7abd-4644-bc6a-6d6ac4a9a10c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "devstral-medium-latest",
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.7,
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        368,
+        240
+      ],
+      "id": "76722680-7e4d-4698-8f3b-b20c6fa7a1f8",
+      "name": "Mistral Cloud Chat Model1",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "ZOxKahg5XLCLngIi",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79d59b8b-1eac-42ff-9c2b-1b79cc2d440a",
+              "name": "TimeStamp",
+              "value": "={{ $json.output.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "58f9e70a-8db6-4c23-9da2-b00368b71890",
+              "name": "Node of occurence",
+              "value": "={{ $json.output['node of occurrence'] }}",
+              "type": "string"
+            },
+            {
+              "id": "121bfeb8-96b9-41fe-87dd-62579e8b565d",
+              "name": "Error",
+              "value": "={{ $json.output.error }}",
+              "type": "string"
+            },
+            {
+              "id": "b6caaa2e-52b3-41ed-9e7f-2db50c028395",
+              "name": "Solution",
+              "value": "={{ $json.output.solution }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        144
+      ],
+      "id": "de35fe17-d0df-4a19-ad5b-a8f5e0da55e2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "seth.chege77@gmail.com",
+        "subject": "Error in Pipeline Health Monitor",
+        "emailType": "text",
+        "message": "=Error detected in pipeline health monitor workflow.\n{{ $json['Nodeof Occurence'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "d33816a5-1d4f-4b3c-b07d-8ec7cfa8880f",
+      "name": "Send a message",
+      "webhookId": "f740cf36-5896-4292-bbba-c279cb322349",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7C4ZLHORbZZiQh23",
+          "name": "Seth gmail .77"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1W29Bxz-zqCSCJ2Sd1UZpc642ced6xlhhkFAR80jv318/edit?gid=659498928#gid=659498928",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1759028113,
+          "mode": "list",
+          "cachedResultName": "Pipeline health monitor workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1W29Bxz-zqCSCJ2Sd1UZpc642ced6xlhhkFAR80jv318/edit#gid=1759028113"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TimeStamp": "={{ $json.TimeStamp }}",
+            "Node of Occurence": "={{ $json['Node of occurence'] }}",
+            "Error": "={{ $json.Error }}",
+            "Solution": "={{ $json.Solution }}"
+          },
+          "matchingColumns": [
+            "TimeStamp"
+          ],
+          "schema": [
+            {
+              "id": "TimeStamp",
+              "displayName": "TimeStamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Node of Occurence",
+              "displayName": "Node of Occurence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error",
+              "displayName": "Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Solution",
+              "displayName": "Solution",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        32
+      ],
+      "id": "c81e75c2-a365-44e9-b569-eff3e61b42d9",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCmLBq0v2dczhuZ6",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "53ee0111-48fc-42c1-acdc-109c783a182e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1c92e6d2758826f3d5c62cd3662bba6a9028a954802e057a2d3f0fd91308ae30"
+  },
+  "id": "FEDFLo8zElk6vC7d",
+  "tags": []
+}
